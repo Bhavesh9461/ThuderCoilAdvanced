@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Password is required."],
-        minlength: 6
+        minlength: 6,
+        select: false
     },
     bio:{
         type: String,
@@ -74,7 +75,7 @@ userSchema.pre("save", async function() {
  * @description used to compare password at login
  * @way for create a method you have to do like this -> userSchema.methods.<methodName>
  */
-userSchema.methods.matchPassword = async function(enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) {
     const isPasswordCorrect = await bcrypt.compare(enteredPassword, this.password)
     return isPasswordCorrect
 }
