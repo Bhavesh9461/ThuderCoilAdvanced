@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema({
  * @description it is used to hash password in schema
  */
 userSchema.pre("save", async function() {
-    if(!this.isModified("password")) return
+    if(!this.isModified("password")) return 
 
     try {
         const salt = await bcrypt.genSalt(10)
