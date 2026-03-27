@@ -3,15 +3,27 @@ import React, { useState } from "react";
 import FloatingShape from "../components/FloatingShape";
 import { CloudLightning, Lock, Mail, User, UserKey } from "lucide-react";
 import Input from "../components/Input";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import ActionButton from "../components/ActionButton";
+import useSignUp from "../hooks/useSignUp.js";
 
 const SignUpPage = () => {
+  
+  const navigate = useNavigate()
+
   const [signupData, setSignupData] = useState({
     fullName: "",
     userName: "",
     email: "",
     password: "",
   });
+
+  const {isPending, error , signupMutation} = useSignUp()
+
+  const handleSignup = async (e)=>{
+    e.preventDefault()
+    signupMutation(signupData)
+  }
 
   return (
     <div
@@ -56,8 +68,15 @@ const SignUpPage = () => {
             </span>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="alert alert-error mb-4">
+              <span>{error.response.data.message}</span>
+            </div>
+          )}
+
           <div className="w-full">
-            <form>
+            <form onSubmit={handleSignup}>
               <div className="space-y-2">
                 {/* HEADER PART */}
                 <div>
@@ -148,16 +167,10 @@ const SignUpPage = () => {
                   </div>
                 </div>
 
-                <button className="btn btn-primary w-full">
-                  {false ? (
-                    <>
-                      <span className="loading loading-spinner loading-xs"></span>
-                      Loading...
-                    </>
-                  ) : (
-                    "Create Account"
-                  )}
-                </button>
+                <ActionButton
+                 btnName={"Create Account"}
+                 isPending={isPending}
+                />
 
                 <div className="text-center mt-4">
                   <p className="text-sm">
