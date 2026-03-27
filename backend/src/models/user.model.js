@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Password is required."],
-        minlength: 6
+        minlength: 6,
+        select: false
     },
     bio:{
         type: String,
@@ -60,7 +61,7 @@ const userSchema = new mongoose.Schema({
  * @description it is used to hash password in schema
  */
 userSchema.pre("save", async function() {
-    if(!this.isModified("password")) return
+    if(!this.isModified("password")) return 
 
     try {
         const salt = await bcrypt.genSalt(10)
@@ -74,7 +75,7 @@ userSchema.pre("save", async function() {
  * @description used to compare password at login
  * @way for create a method you have to do like this -> userSchema.methods.<methodName>
  */
-userSchema.methods.matchPassword = async function(enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) {
     const isPasswordCorrect = await bcrypt.compare(enteredPassword, this.password)
     return isPasswordCorrect
 }
