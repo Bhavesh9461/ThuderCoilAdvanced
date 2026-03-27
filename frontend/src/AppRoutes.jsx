@@ -4,6 +4,8 @@ import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import ProtectedRoute from './middleware/ProtectedRoute'
 import AuthRoute from './middleware/AuthRoute'
+import OnboardingRoute from './middleware/OnboardingRoute'
+import OnboardingPage from './pages/OnboardingPage'
 
 const AppRoutes = ({isAuthenticated, isOnboarded}) => {
 
@@ -25,18 +27,11 @@ const AppRoutes = ({isAuthenticated, isOnboarded}) => {
           </AuthRoute>
         } />
         <Route path='/onboarding' element={
-           isAuthenticated ? (
-        !isOnboarded ? (
-           <>
-           <h1>onboard page</h1>
-           </>
-        ) : (
-          <Navigate to="/" />
-        )
-      ) : (
-        <Navigate to="/login" />
-      )
-        } />
+           <OnboardingRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} >
+              <OnboardingPage/>
+           </OnboardingRoute>
+          } 
+        />
     </Routes>
   )
 }

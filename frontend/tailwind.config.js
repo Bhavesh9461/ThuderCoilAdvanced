@@ -15,7 +15,8 @@ export default {
       "light",
       "dark",
       "lemonade",
-      "forest"
+      "forest",
+      "night"
     ]
   }
 }
