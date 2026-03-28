@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout, signup } from "../controllers/auth.controller.js";
+import { login, logout, onboard, signup } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const authRouter = express.Router()
@@ -32,5 +32,11 @@ authRouter.get("/me", protectRoute, (req,res)=>{
         user: req.user
     })
 })
+
+/**
+ * @route /api/auth/onboarding
+ * @method POST
+ */
+authRouter.post("/onboarding", protectRoute, onboard)
 
 export default authRouter
