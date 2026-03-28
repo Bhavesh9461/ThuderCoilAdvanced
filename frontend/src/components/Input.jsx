@@ -4,11 +4,11 @@ const Input = ({ icon: Icon, labelName, ...props }) => {
   return (
     <div className="form-control w-full">
       <label className="label">
-        <span className="label-text">{labelName}</span>
+        {labelName && <span className="label-text">{labelName}</span>}
       </label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Icon className="size-5 text-blue-500" />
+          {Icon && <Icon className="size-5 text-blue-500" />}
         </div>
         <input
           {...props}

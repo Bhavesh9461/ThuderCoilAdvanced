@@ -3,6 +3,7 @@ import AppRoutes from './AppRoutes'
 import { useThemeStore } from './store/useThemeStore.js'
 import { Toaster } from 'react-hot-toast'
 import useAuthUser from './hooks/useAuthUser.js'
+import PageLoader from './components/PageLoader.jsx'
 
 const App = () => {
 
@@ -14,7 +15,7 @@ const App = () => {
   const isOnboarded = authUser?.isOnboarded
 
   if(isLoading){
-    return "Loading..."
+    return <PageLoader/>
   }
 
   return (
