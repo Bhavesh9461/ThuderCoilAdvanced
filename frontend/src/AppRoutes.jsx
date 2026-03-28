@@ -6,6 +6,8 @@ import ProtectedRoute from './middleware/ProtectedRoute'
 import AuthRoute from './middleware/AuthRoute'
 import OnboardingRoute from './middleware/OnboardingRoute'
 import OnboardingPage from './pages/OnboardingPage'
+import HomePage from './pages/HomePage'
+import Layout from './components/Layout'
 
 const AppRoutes = ({isAuthenticated, isOnboarded}) => {
 
@@ -13,7 +15,9 @@ const AppRoutes = ({isAuthenticated, isOnboarded}) => {
     <Routes>
         <Route path='/' element={
           <ProtectedRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded}>
-            homePage
+            <Layout showSidebar={true}>
+              <HomePage/>
+            </Layout>
           </ProtectedRoute>
         } />
         <Route path='/signup' element={
