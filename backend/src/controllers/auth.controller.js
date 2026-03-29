@@ -98,11 +98,11 @@ export async function verifyEmail(req, res) {
   try {
     const { code } = req.body;
 
-    if (!code) {
-      return res.status(400).json({
-        message: "Otp is required.",
-      });
-    }
+    // if (!code) {
+    //   return res.status(400).json({
+    //     message: "Otp is required.",
+    //   });
+    // }
 
     const user = await userModel.findOne({
       verificationToken: code,
@@ -166,25 +166,25 @@ export async function login(req, res) {
       });
     }
 
+    if(!user.isVerified){
+      const verificationToken = generateVerificationToken()
+
+      user.verificationToken = verificationToken
+      user.verificationTokenExpiresAt = Date.now() + 10 * 60 * 60 * 1000, // 10 minutes
+      await user.save()
+
+      await sendVerificationEmail(user.email, verificationToken)
+
+      return res.status(401).json({
+        message: "You are not verified, verify first from email that we sent now."
+      })
+    }
+
     /**
      * @description finally login and generate token for login
      */
-    const token = jwt.sign(
-      {
-        userId: user._id,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
+    generateTokenAndSetCookie(res, user._id)
 
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-    });
     user.password = undefined;
     res.status(200).json({
       success: true,

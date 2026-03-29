@@ -6,6 +6,7 @@ import Input from "../components/Input";
 import { Link, useNavigate } from "react-router";
 import ActionButton from "../components/ActionButton";
 import useSignUp from "../hooks/useSignUp.js";
+import PasswordStrengthMeter from "../components/PasswordStrengthMeter.jsx";
 
 const SignUpPage = () => {
   
@@ -27,7 +28,7 @@ const SignUpPage = () => {
 
   return (
     <div
-      className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-900 relative overflow-hidden"
+      className=" flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-900 relative overflow-hidden"
       data-theme="forest"
     >
       <FloatingShape
@@ -145,6 +146,7 @@ const SignUpPage = () => {
                     }}
                     required
                   />
+                  <PasswordStrengthMeter password={signupData.password} />
 
                   <div className="form-control">
                     <label className="label cursor-pointer justify-start gap-2">
@@ -220,6 +222,7 @@ const SignUpPage = () => {
                 together
               </p>
             </div>
+
           </div>
         </div>
       </motion.div>

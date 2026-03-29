@@ -3,8 +3,9 @@ import { VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE } from "./emailTemp
 
 export const sendVerificationEmail = async (email, verificationToken) => {
   const recipient = [{ email }];
-
+  
   try {
+    const verifyUrl = `${process.env.CLIENT_URL}/verify-email`
     const emailData = {
       sender: sender,
       to: recipient,
@@ -12,7 +13,8 @@ export const sendVerificationEmail = async (email, verificationToken) => {
       htmlContent: VERIFICATION_EMAIL_TEMPLATE.replace(
         "{verificationCode}",
         verificationToken,
-      ),
+      )
+      .replace("{verifyUrl}", verifyUrl),
     };
 
     const result = await apiInstance.sendTransacEmail(emailData);
@@ -24,15 +26,18 @@ export const sendVerificationEmail = async (email, verificationToken) => {
   }
 };
 
+
 export const sendWelcomeEmail = async (email, name) => {
   const recipient = [{ email }];
 
   try {
+    const LoginLink = `${process.env.CLIENT_URL}/login`
     const emailData = {
       sender: sender,
       to: recipient,
       subject: "Welcome To ThunderCoil",
-      htmlContent: WELCOME_EMAIL_TEMPLATE.replace("{username}", name),
+      htmlContent: WELCOME_EMAIL_TEMPLATE.replace("{username}", name)
+      .replace("{LoginLink}", LoginLink),
     };
 
     const result = await apiInstance.sendTransacEmail(emailData);

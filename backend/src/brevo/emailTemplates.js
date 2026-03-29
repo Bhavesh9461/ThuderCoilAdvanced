@@ -55,7 +55,7 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
               <table cellpadding="0" cellspacing="0" align="center" style="margin:25px auto;">
                 <tr>
                   <td align="center">
-                    <a href="http://localhost:5000/"
+                    <a href="{verifyUrl}"
                       style="
                         background:#4f46e5;
                         color:#ffffff;
@@ -236,7 +236,7 @@ export const WELCOME_EMAIL_TEMPLATE = `
               <table cellpadding="0" cellspacing="0" align="center" style="margin:30px auto;">
                 <tr>
                   <td align="center">
-                    <a href="http://localhost:5173/login"
+                    <a href="{LoginLink}"
                       style="
                         background:#4f46e5;
                         color:#ffffff;
