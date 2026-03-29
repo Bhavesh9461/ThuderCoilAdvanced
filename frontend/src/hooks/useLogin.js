@@ -12,6 +12,9 @@ const useLogin = () => {
     onSuccess: ()=>{
         toast.success("Logged In successfully.")
         queryClient.invalidateQueries({queryKey: ["authUser"]})
+    },
+    onError: (error)=>{
+        toast.error(error?.response?.data?.message || error?.message || "Something went wrong")
     }
   })
 

@@ -10,7 +10,7 @@ const useSignUp = () => {
         mutationKey: ["signup"],
         mutationFn: signup,
         onSuccess: () =>{
-            toast.success("Account registered successfully.")
+            toast.success("We sent a email, verify your email.")
             queryClient.invalidateQueries({queryKey: ["authUser"]})
         }
     })

@@ -13,12 +13,12 @@ const LoginPage = () => {
     password: "",
   });
 
-  const {isPending, error, loginMutation} = useLogin()
+  const { isPending, error, loginMutation } = useLogin();
 
-  const handleLogin = (e)=>{
-    e.preventDefault()
-    loginMutation(loginData)
-  }
+  const handleLogin = (e) => {
+    e.preventDefault();
+    loginMutation(loginData);
+  };
 
   return (
     <div
@@ -65,8 +65,8 @@ const LoginPage = () => {
 
           {/* Error message */}
           {error && (
-            <div className='alert alert-error mb-4'>
-              <span>{error.response.data.message}</span>
+            <div className="alert alert-error mb-4">
+              <span>{error?.response?.data?.message || error?.message}</span>
             </div>
           )}
 
@@ -111,9 +111,15 @@ const LoginPage = () => {
                       });
                     }}
                   />
-                  <br />
+                  <div className="flex items-center mb-6">
+                    <Link
+                      to="/forgot-password"
+                      className="text-sm text-blue-400 hover:underline"
+                    >
+                      Forgot Password ?
+                    </Link>
+                  </div>
                   <ActionButton isPending={isPending} btnName={"Sign In"} />
-                  
 
                   {/* switch between login and signup */}
                   <div className="text-center mt-4">

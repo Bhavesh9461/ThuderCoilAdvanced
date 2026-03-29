@@ -13,6 +13,7 @@ const App = () => {
   
   const isAuthenticated = Boolean(authUser)
   const isOnboarded = authUser?.isOnboarded
+  const isVerified = authUser?.isVerified
 
   if(isLoading){
     return <PageLoader/>
@@ -20,8 +21,8 @@ const App = () => {
 
   return (
     <div className="h-screen" data-theme={theme}>
-      <AppRoutes isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} />
-
+      <AppRoutes isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified} />
+        
       <Toaster/>
     </div>
   )

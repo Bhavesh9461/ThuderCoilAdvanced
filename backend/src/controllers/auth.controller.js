@@ -1,6 +1,9 @@
 import { upsertStreamUser } from "../lib/stream.js";
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import { generateVerificationToken } from "../utils/generateVerificationToken.js";
+import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
+import { sendVerificationEmail, sendWelcomeEmail } from "../brevo/email.js";
 
 export async function signup(req, res) {
   const { fullName, userName, email, password } = req.body;
@@ -45,12 +48,16 @@ export async function signup(req, res) {
     const idx = Math.floor(Math.random() * 100) + 1;
     const randomAvatar = `https://api.dicebear.com/9.x/micah/svg?seed=${idx}.jpg`;
 
+    const verificationToken = generateVerificationToken();
+
     const newUser = await userModel.create({
       fullName,
       userName,
       email,
       password,
       profilePic: randomAvatar,
+      verificationToken: verificationToken,
+      verificationTokenExpiresAt: Date.now() + 10 * 60 * 60 * 1000, // 10 minutes
     });
 
     /**
@@ -69,23 +76,11 @@ export async function signup(req, res) {
     /**
      * @description generate cookie or token
      */
-    const token = jwt.sign(
-      {
-        userId: newUser._id,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
+    generateTokenAndSetCookie(res, newUser._id);
 
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      httpOnly: true, // prevent xss attacks
-      sameSite: "strict", // prevent CSRF attacks
-      secure: process.env.NODE_ENV === "production",
-    });
+    await sendVerificationEmail(newUser.email, verificationToken);
 
+    newUser.password = undefined;
     res.status(201).json({
       success: true,
       user: newUser,
@@ -96,6 +91,46 @@ export async function signup(req, res) {
       success: false,
       message: "Internal server error.",
     });
+  }
+}
+
+export async function verifyEmail(req, res) {
+  try {
+    const { code } = req.body;
+
+    // if (!code) {
+    //   return res.status(400).json({
+    //     message: "Otp is required.",
+    //   });
+    // }
+
+    const user = await userModel.findOne({
+      verificationToken: code,
+      verificationTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired verification code.",
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.fullName);
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+      user,
+    });
+  } catch (error) {
+    console.log(`Error in verifyEmail controller: `, error);
+    throw new Error(`Error in  verifyEmail controller:`, error);
   }
 }
 
@@ -131,25 +166,25 @@ export async function login(req, res) {
       });
     }
 
+    if(!user.isVerified){
+      const verificationToken = generateVerificationToken()
+
+      user.verificationToken = verificationToken
+      user.verificationTokenExpiresAt = Date.now() + 10 * 60 * 60 * 1000, // 10 minutes
+      await user.save()
+
+      await sendVerificationEmail(user.email, verificationToken)
+
+      return res.status(401).json({
+        message: "You are not verified, verify first from email that we sent now."
+      })
+    }
+
     /**
      * @description finally login and generate token for login
      */
-    const token = jwt.sign(
-      {
-        userId: user._id,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
+    generateTokenAndSetCookie(res, user._id)
 
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-    });
     user.password = undefined;
     res.status(200).json({
       success: true,
@@ -213,15 +248,20 @@ export async function onboard(req, res) {
      * @description update the user info in stream platfrom
      */
     try {
-        await upsertStreamUser({
-            id: updatedUser._id.toString(),
-            name: updatedUser.userName,
-            image: updatedUser.profilePic || ""
-        })
+      await upsertStreamUser({
+        id: updatedUser._id.toString(),
+        name: updatedUser.userName,
+        image: updatedUser.profilePic || "",
+      });
 
-        console.log(`Stream user updated after onboarding for ${updatedUser.fullName}`);
+      console.log(
+        `Stream user updated after onboarding for ${updatedUser.fullName}`,
+      );
     } catch (streamError) {
-        console.log("Error updating Stream user during onboarding: ", streamError.message);
+      console.log(
+        "Error updating Stream user during onboarding: ",
+        streamError.message,
+      );
     }
 
     res.status(200).json({

@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout, onboard, signup } from "../controllers/auth.controller.js";
+import { login, logout, onboard, signup, verifyEmail } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const authRouter = express.Router()
@@ -9,6 +9,12 @@ const authRouter = express.Router()
  * @method POST 
  */
 authRouter.post("/signup", signup)
+
+/**
+ * @route /api/auth/verify-email
+ * @method POST 
+ */
+authRouter.post("/verify-email", verifyEmail)
 
 /**
  * @route /api/auth/login
