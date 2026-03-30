@@ -1,9 +1,14 @@
 import { upsertStreamUser } from "../lib/stream.js";
 import userModel from "../models/user.model.js";
-import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { generateVerificationToken } from "../utils/generateVerificationToken.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
-import { sendVerificationEmail, sendWelcomeEmail } from "../brevo/email.js";
+import {
+  sendPasswordResetEmail,
+  sendResetSuccessEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from "../brevo/email.js";
 
 export async function signup(req, res) {
   const { fullName, userName, email, password } = req.body;
@@ -57,7 +62,7 @@ export async function signup(req, res) {
       password,
       profilePic: randomAvatar,
       verificationToken: verificationToken,
-      verificationTokenExpiresAt: Date.now() + 10 * 60 * 60 * 1000, // 10 minutes
+      verificationTokenExpiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes
     });
 
     /**
@@ -166,24 +171,25 @@ export async function login(req, res) {
       });
     }
 
-    if(!user.isVerified){
-      const verificationToken = generateVerificationToken()
+    if (!user.isVerified) {
+      const verificationToken = generateVerificationToken();
 
-      user.verificationToken = verificationToken
-      user.verificationTokenExpiresAt = Date.now() + 10 * 60 * 60 * 1000, // 10 minutes
-      await user.save()
+      user.verificationToken = verificationToken;
+      ((user.verificationTokenExpiresAt = Date.now() + 10 * 60 * 60 * 1000), // 10 minutes
+        await user.save());
 
-      await sendVerificationEmail(user.email, verificationToken)
+      await sendVerificationEmail(user.email, verificationToken);
 
       return res.status(401).json({
-        message: "You are not verified, verify first from email that we sent now."
-      })
+        message:
+          "You are not verified, verify first from email that we sent now.",
+      });
     }
 
     /**
      * @description finally login and generate token for login
      */
-    generateTokenAndSetCookie(res, user._id)
+    generateTokenAndSetCookie(res, user._id);
 
     user.password = undefined;
     res.status(200).json({
@@ -273,5 +279,84 @@ export async function onboard(req, res) {
     res.status(500).json({
       message: "Internal Server Error!",
     });
+  }
+}
+
+export async function forgotPassword(req, res) {
+  const { email } = req.body;
+
+  try {
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    //generate reset token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const resetTokenExpiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpiresAt = resetTokenExpiresAt;
+    await user.save();
+
+    //send email
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Sent forgot password email successfully.",
+    });
+  } catch (error) {
+    console.log("Error in forgotPassword controller: ", error);
+    throw new Error("Error in forgotPassword controller: ", error);
+  }
+}
+
+export async function resetPassword(req, res) {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({
+        message: "All fields are required.",
+        missingFields: [!token && "token", !password && "password"].filter(
+          Boolean,
+        ),
+      });
+    }
+
+    const user = await userModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired reset token." });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+    await user.save();
+
+    await sendResetSuccessEmail(user.email, user.fullName);
+
+    res.status(200).json({
+      success: true,
+      message: "Password Reset Successfully.",
+    });
+  } catch (error) {
+    console.log("Error in resetPassword controller: ", error);
+    res.status(400).json({ success: false, message: error.message });
   }
 }

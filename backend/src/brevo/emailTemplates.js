@@ -113,7 +113,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
     
     <h2 style="color:#28a745;">Password Updated Successfully ✅</h2>
     
-    <p>Hello,</p>
+    <p>Hello,{username}</p>
     
     <p>Your password has been successfully changed.</p>
     
@@ -165,7 +165,7 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
       </a>
     </div>
     
-    <p>This link will expire in <b>1 hour</b>.</p>
+    <p>This link will expire in <b>10 minutes</b>.</p>
     
     <p>If you did not request this, you can safely ignore this email.</p>
     

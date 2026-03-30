@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout, onboard, signup, verifyEmail } from "../controllers/auth.controller.js";
+import { forgotPassword, login, logout, onboard, resetPassword, signup, verifyEmail } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const authRouter = express.Router()
@@ -44,5 +44,17 @@ authRouter.get("/me", protectRoute, (req,res)=>{
  * @method POST
  */
 authRouter.post("/onboarding", protectRoute, onboard)
+
+/**
+ * @route /api/auth/forgot-password
+ * @method POST
+ */
+authRouter.post("/forgot-password", forgotPassword)
+
+/**
+ * @route /api/auth/reset-password/:token
+ * @method POST
+ */
+authRouter.post("/reset-password/:token", resetPassword)
 
 export default authRouter
