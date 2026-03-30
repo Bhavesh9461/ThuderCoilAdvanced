@@ -7,6 +7,7 @@ import path from "path";
  * @description import routes
  */
 import authRoutes from "./routes/auth.route.js";
+import chatRoutes from "./routes/chat.route.js";
 
 
 const app = express()
@@ -24,6 +25,7 @@ app.use(cookieParser())
 
 // use routes
 app.use("/api/auth", authRoutes)
+app.use("/api/chat", chatRoutes)
 
 /**
  * @TODO
