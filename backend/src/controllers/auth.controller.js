@@ -324,12 +324,9 @@ export async function resetPassword(req, res) {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!token || !password) {
+    if (!password) {
       return res.status(400).json({
-        message: "All fields are required.",
-        missingFields: [!token && "token", !password && "password"].filter(
-          Boolean,
-        ),
+        message: "Password missing!",
       });
     }
 

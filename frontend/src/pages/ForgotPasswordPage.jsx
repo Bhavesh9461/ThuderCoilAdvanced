@@ -4,13 +4,21 @@ import { useState } from "react";
 import FloatingShape from "../components/FloatingShape";
 import Input from "../components/Input";
 import { Loader, Mail } from "lucide-react";
+import { useForgotPassword } from "../hooks/useAuthUpdate.js";
+import { Link } from "react-router";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const { forgotPasswordMutation, isPending, error } = useForgotPassword();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    forgotPasswordMutation(email, {
+      onSuccess: () => setIsSubmitted(true),
+      onError: () => setIsSubmitted(false),
+    });
   };
 
   return (
@@ -68,7 +76,7 @@ const ForgotPasswordPage = () => {
               via-blue-600 text-white font-bold rounded-lg shadow-lg hover:from-blue-600 hover:to-cyan-500 hover:via-blue-800 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 mt-2"
               type="submit"
             >
-              {false ? (
+              {isPending ? (
                 <Loader className="animate-spin mx-auto size-6" />
               ) : (
                 "Send Reset Link"
@@ -78,18 +86,28 @@ const ForgotPasswordPage = () => {
         ) : (
           <div className="text-center">
             <motion.div
-              initial={{scale:0}}
-              animate={{scale:1}}
-              transition={{type: "spring", stiffness:500, damping:30}}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
               className="size-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4"
             >
               <Mail className="size-8 text-white" />
             </motion.div>
             <p className="text-gray-300 mb-6">
-              If an account exists for {email}, you will receive a password reset link shortly.
+              If an account exists for {email}, you will receive a password
+              reset link shortly.
             </p>
           </div>
         )}
+
+        <div className="text-center mt-4 text-white">
+          <p className="text-sm uppercase">
+            Click here for{" "}
+            <Link to="/login" className="text-blue-300 hover:underline">
+              Sign In
+            </Link>
+          </p>
+        </div>
       </motion.div>
     </div>
   );

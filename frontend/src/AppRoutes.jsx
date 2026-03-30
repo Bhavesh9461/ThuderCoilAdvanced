@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage'
 import Layout from './components/Layout'
 import EmailVerificationPage from './pages/EmailVerificationPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
 
@@ -17,7 +18,7 @@ const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
     <Routes>
         <Route path='/' element={
           <ProtectedRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
-            <Layout showSidebar={true}>
+            <Layout>
               <HomePage/>
             </Layout>
           </ProtectedRoute>
@@ -48,6 +49,11 @@ const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
         <Route path='/forgot-password' element={
           <AuthRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
               <ForgotPasswordPage/>
+          </AuthRoute>
+        } />
+        <Route path='/reset-password/:token' element={
+          <AuthRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
+              <ResetPasswordPage/>
           </AuthRoute>
         } />
 

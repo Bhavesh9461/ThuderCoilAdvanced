@@ -35,3 +35,15 @@ export const completeOnboarding = async (userData)=>{
     const response = await axiosInstance.post("/auth/onboarding",userData)
     return response.data
 }
+
+export const forgotPassword = async (email) => {
+    const response = await axiosInstance.post("/auth/forgot-password", {email})
+    return response.data
+}
+
+export const resetPassword = async ({token, password}) => {
+    const response = await axiosInstance.post(`/auth/reset-password/${token}`, {password})
+    console.log(typeof password);
+    
+    return response.data
+}
