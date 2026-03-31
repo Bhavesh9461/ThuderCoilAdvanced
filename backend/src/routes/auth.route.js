@@ -1,5 +1,5 @@
 import express from "express";
-import { forgotPassword, login, logout, onboard, resetPassword, signup, verifyEmail } from "../controllers/auth.controller.js";
+import { forgotPassword, login, logout, onboard, resetPassword, searchUser, signup, verifyEmail } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const authRouter = express.Router()
@@ -56,5 +56,11 @@ authRouter.post("/forgot-password", forgotPassword)
  * @method POST
  */
 authRouter.post("/reset-password/:token", resetPassword)
+
+/**
+ * @route /api/auth/search-user
+ * @method POST
+ */
+authRouter.post("/search-user", protectRoute, searchUser)
 
 export default authRouter

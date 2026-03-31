@@ -357,3 +357,32 @@ export async function resetPassword(req, res) {
     res.status(400).json({ success: false, message: error.message });
   }
 }
+
+export async function searchUser(req,res) {
+  try {
+    const {userName} = req.body
+
+    if(!userName){
+      return res.status(400).json({message: "Username is required."})
+    }
+
+    const user = await userModel.findOne({userName})
+
+    if(!user){
+      return res.status(400).json({
+        message: "User not found!"
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User found.",
+      user
+    })
+  } catch (error) {
+    console.log("Error in searchUser controller: ", error.message);
+    res.status(500).json({
+      message: "Internal server error!"
+    })
+  }
+}
