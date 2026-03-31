@@ -17,6 +17,12 @@ export async function signup(req, res) {
     if (!fullName || !userName || !email || !password) {
       return res.status(400).json({
         message: "All fields are required.",
+        missingFields: [
+          !fullName && "fullName",
+          !userName && "userName",
+          !email && "email",
+          !password && "password"
+        ].filter(Boolean)
       });
     }
 
@@ -86,6 +92,8 @@ export async function signup(req, res) {
     await sendVerificationEmail(newUser.email, verificationToken);
 
     newUser.password = undefined;
+    newUser.verificationToken = undefined
+    newUser.verificationTokenExpiresAt = undefined
     res.status(201).json({
       success: true,
       user: newUser,
@@ -358,31 +366,34 @@ export async function resetPassword(req, res) {
   }
 }
 
-export async function searchUser(req,res) {
+export async function searchUser(req, res) {
   try {
-    const {userName} = req.body
-
-    if(!userName){
-      return res.status(400).json({message: "Username is required."})
-    }
-
-    const user = await userModel.findOne({userName})
-
-    if(!user){
+    const { userName } = req.body;
+    const myId = req.user.id;
+    if (!userName) {
       return res.status(400).json({
-        message: "User not found!"
-      })
+        message: "Username is required.",
+      });
     }
 
+    // 🔥 Case-insensitive partial search
+    const users = await userModel
+      .find({
+        userName: { $regex: userName, $options: "i" },
+        _id: { $ne: myId },
+      })
+      .select("_id userName fullName profilePic"); // return only needed fields
+
+    // ✅ Always return 200
     res.status(200).json({
       success: true,
-      message: "User found.",
-      user
-    })
+      users, // array
+    });
   } catch (error) {
-    console.log("Error in searchUser controller: ", error.message);
+    console.log("Error in searchUser controller:", error.message);
+
     res.status(500).json({
-      message: "Internal server error!"
-    })
+      message: "Internal server error!",
+    });
   }
 }

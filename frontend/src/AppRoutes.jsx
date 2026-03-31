@@ -11,6 +11,7 @@ import Layout from './components/Layout'
 import EmailVerificationPage from './pages/EmailVerificationPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import NotificationsPage from './pages/NotificationsPage'
 
 const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
 
@@ -62,6 +63,16 @@ const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
               <OnboardingPage/>
            </OnboardingRoute>
           } 
+        />
+
+        <Route path='/notifications' element={
+          <ProtectedRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
+            <Layout>
+              <NotificationsPage/>
+            </Layout>
+          </ProtectedRoute>
+        }
+        
         />
     </Routes>
   )

@@ -81,6 +81,9 @@ const Sidebar = ({ isOpen, onClose }) => {
 
                 <div className="flex-1">
                   <p className="font-semibold text-sm">
+                    {authUser?.userName}
+                  </p>
+                  <p className="text-xs">
                     {authUser?.fullName}
                   </p>
                   <p className="text-xs text-green-600 flex items-center gap-1">

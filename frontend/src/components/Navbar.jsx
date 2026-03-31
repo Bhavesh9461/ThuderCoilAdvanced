@@ -31,7 +31,6 @@ const Navbar = ({ toggleSidebar }) => {
             <div className="flex items-center gap-1 sm:gap-3 md:gap-4">
               {/* NOTIFICATION LINK */}
               <ButtonLink
-              hasNotification={true}
               icon={BellIcon} routePath={"/notifications"} />
 
               {/* THEMESELECTOR */}
