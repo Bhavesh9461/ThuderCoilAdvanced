@@ -53,7 +53,7 @@ export const getUserFriends = async () => {
 };
 
 export const getOutgoingFriendReqs = async () => {
-  const response = await axiosInstance.get("/users/getOutgoingFriendReqs");
+  const response = await axiosInstance.get("/users/outgoing-friend-requests");
   return response.data;
 };
 
@@ -69,6 +69,12 @@ export const searchUser = async (data) => {
 
   return res.data.users; // ✅ MUST BE ARRAY
 };
+
+// get all recommended users
+export async function getRecommendedUsers() {
+  const response = await axiosInstance.get("/users")
+  return response.data
+}
 
 export const getFriendRequests = async () => {
   const response = await axiosInstance.get("/users/friend-requests");

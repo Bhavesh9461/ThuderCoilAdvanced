@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-    acceptFriendRequest,
-    getFriendRequests,
+  acceptFriendRequest,
+  getFriendRequests,
   getOutgoingFriendReqs,
+  getRecommendedUsers,
   getUserFriends,
   searchUser,
   sendFriendReqs,
@@ -18,12 +19,15 @@ export const useGetUserFriends = () => {
 };
 
 export const useOutgoingFriendReqs = () => {
-  const { data: outgoingFriendReqs } = useQuery({
+  const { data, ...rest } = useQuery({
     queryKey: ["outgoingFriendReqs"],
     queryFn: getOutgoingFriendReqs,
   });
 
-  return { outgoingFriendReqs };
+  return {
+    outgoingFriendReqs: data?.data || data || [],
+    ...rest,
+  };
 };
 
 export const useSendFriendReqs = () => {
@@ -41,9 +45,14 @@ export const useSendFriendReqs = () => {
 };
 
 export const useSearchUsers = (searchTerm) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["searchUsers", searchTerm],
     queryFn: () => searchUser({ userName: searchTerm }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["outgoingFriendReqs"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
     enabled: !!searchTerm, // only run when value exists
     staleTime: 1000 * 60, // optional: cache for 1 min
   });
@@ -68,7 +77,16 @@ export const useAcceptFriendRequest = () => {
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
-  })
+  });
 
-  return {acceptRequestMutation, isPending}
+  return { acceptRequestMutation, isPending };
+};
+
+export const useGetRecommendedUsers = () => {
+  const { data: recommendedUsers = [], isLoading: loadingUsers } = useQuery({
+    queryKey: ["users"],
+    queryFn: getRecommendedUsers,
+  });
+
+  return { recommendedUsers, loadingUsers };
 };

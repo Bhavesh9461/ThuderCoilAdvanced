@@ -1,6 +1,29 @@
 import friendRequestModel from "../models/friendRequest.model.js";
 import userModel from "../models/user.model.js";
 
+export async function getRecommendedUsers(req, res) {
+  try {
+    const currentUserId = req.user.id; // id -> get normal userId but when you use _id -> it give  ObjectId format
+
+    const currentUser = req.user;
+
+    const recommendedUsers = await userModel.find({
+      $and: [
+        { _id: { $ne: currentUserId } }, // exclude current user -> means myself
+        { _id: { $nin: currentUser.friends } }, // exclude current user's friends
+        { isOnboarded: true },
+      ],
+    });
+
+    res.status(200).json(recommendedUsers);
+  } catch (error) {
+    console.error("Error in getRecommendedUsers controller", error.message);
+    res.status(500).json({
+      message: "Internal Server Error!",
+    });
+  }
+}
+
 export async function getMyFriends(req, res) {
   try {
     const user = await userModel
@@ -168,9 +191,9 @@ export async function getOutgoingFriendReqs(req, res) {
     const outgoingReqs = await friendRequestModel.find({
       sender: req.user.id,
       status: "pending"
-    }).populate("recipient", "fullName userName skill profilePic language")
+    }).populate("recipient", "_id fullName userName skill profilePic language")
 
-    res.status(200).json({outgoingReqs})
+    res.status(200).json(outgoingReqs)
   } catch (error) {
     console.error("Error in getOutgoingFriendReqs controller: ", error.message);
     res.status(500).json({

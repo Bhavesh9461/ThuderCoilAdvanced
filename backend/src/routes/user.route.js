@@ -1,6 +1,6 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import { acceptFriendRequest, getFriendRequests, getMyFriends, getOutgoingFriendReqs, sendFriendRequest } from "../controllers/user.controller.js";
+import { acceptFriendRequest, getFriendRequests, getMyFriends, getOutgoingFriendReqs, getRecommendedUsers, sendFriendRequest } from "../controllers/user.controller.js";
 
 const userRouter = express.Router()
 
@@ -9,6 +9,13 @@ const userRouter = express.Router()
  * @uses when you have to add this route to before all controllers
  */
 userRouter.use(protectRoute)
+
+/**
+ * @route GET /api/users/
+ * @description get all recommended users from db
+ * @access PRIVATE
+ */
+userRouter.get("/", getRecommendedUsers)
 
 /**
  * @route GET /api/users/friends

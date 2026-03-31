@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { sendFriendReqs } from "../lib/api.js";
+import React, { useEffect, useMemo, useState } from "react";
+import { getOutgoingFriendReqs, sendFriendReqs } from "../lib/api.js";
 import FriendCard from "../components/FriendCard.jsx";
 import NoFriendsFound from "../components/NoFriendsFound.jsx";
 import {
+  useGetRecommendedUsers,
   useGetUserFriends,
   useOutgoingFriendReqs,
   useSearchUsers,
   useSendFriendReqs,
 } from "../hooks/useFriendRequests.js";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle, MessageCircleOff, MessageSquare, MessagesSquare } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  CheckCircleIcon,
+  MessageCircle,
+  MessageCircleOff,
+  MessageSquare,
+  MessagesSquare,
+  UserPlusIcon,
+} from "lucide-react";
 
 const HomePage = () => {
   const [userName, setUserName] = useState("");
@@ -18,9 +26,13 @@ const HomePage = () => {
   const [pendingRequestId, setPendingRequestId] = useState(null);
   const [friendsIds, setFriendsIds] = useState(new Set());
   const [isBlurred, setIsBlurred] = useState(false);
+  const [showError, setShowError] = useState("");
 
   const { friends, loadingFriends } = useGetUserFriends();
-  const { outgoingFriendReqs } = useOutgoingFriendReqs();
+  const { data: outgoingFriendReqs = [] } = useQuery({
+    queryKey: ["outgoingFriendReqs"],
+    queryFn: getOutgoingFriendReqs,
+  });
 
   useEffect(() => {
     const ids = new Set();
@@ -48,40 +60,58 @@ const HomePage = () => {
     error: searchError,
   } = useSearchUsers(debouncedValue);
 
+  const { recommendedUsers, loadingUsers } = useGetRecommendedUsers();
+
   const queryClient = useQueryClient();
   const {
     mutate: sendRequestMutation,
     isPending: sendPending,
     error: sendError,
+    reset,
   } = useMutation({
     mutationKey: ["sendRequest"],
     mutationFn: sendFriendReqs,
     onMutate: async (userId) => {
       setPendingRequestId(userId);
-      setOutgoingRequestsIds((prev) => {
-        const updated = new Set(prev);
-        updated.add(userId);
-        return updated;
-      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["outgoingFriendReqs"] });
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
     onSettled: () => {
       setPendingRequestId(null);
     },
+    onError: (error) => {
+      console.log(error.message);
+    },
   });
 
   // 🔥 Track already sent requests
+
   useEffect(() => {
-    const ids = new Set();
-    if (outgoingFriendReqs?.length) {
+    // 🔥 normalize response
+    const outgoingIds = new Set();
+    if (outgoingFriendReqs && outgoingFriendReqs.length > 0) {
       outgoingFriendReqs.forEach((req) => {
-        ids.add(req.recipient._id);
+        outgoingIds.add(String(req?.recipient?._id));
       });
+      setOutgoingRequestsIds(outgoingIds);
     }
-    setOutgoingRequestsIds(ids);
   }, [outgoingFriendReqs]);
+
+  
+
+  useEffect(() => {
+    if (sendError && userName) {
+      setShowError(sendError);
+
+      const timer = setTimeout(() => {
+        setShowError("");
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [sendError, userName, searchedUsers]);
 
   return (
     <div className="h-[calc(100vh-64px)] flex flex-col md:flex-row p-10 gap-8 justify-between bg-base-100">
@@ -93,7 +123,11 @@ const HomePage = () => {
           <div className="p-4 border-b border-base-300">
             <input
               value={userName}
-              onChange={(e) => setUserName(e.target.value)}
+              onChange={(e) => {
+                setUserName(e.target.value);
+                setShowError("");
+                reset();
+              }}
               type="text"
               placeholder="Search friends..."
               className="input input-bordered w-full"
@@ -108,6 +142,14 @@ const HomePage = () => {
                 {searchError.message || "Search failed"}
               </p>
             )}
+            {/* Send Request Error */}
+            {showError && (
+              <p className="text-red-500 text-sm mt-2">
+                {sendError?.response?.data?.message ||
+                  sendError.message ||
+                  "Request failed"}
+              </p>
+            )}
           </div>
 
           {/* 🔥 LIST */}
@@ -119,10 +161,11 @@ const HomePage = () => {
               ) : (
                 searchedUsers.map((user) => {
                   if (!user?._id) return null;
-
+                  
                   const alreadySent = outgoingRequestsIds.has(user._id);
                   const isFriend = friendsIds.has(user._id);
                   const isThisSending = pendingRequestId === user._id;
+                  
 
                   return (
                     <div
@@ -135,14 +178,26 @@ const HomePage = () => {
                       {!isFriend ? (
                         <button
                           disabled={alreadySent || isThisSending}
-                          onClick={() => sendRequestMutation(user._id)}
+                          onClick={() => {
+                            if (alreadySent || isThisSending || showError)
+                              return; // ✅ prevent bad call
+                            sendRequestMutation(user._id);
+                          }}
                           className="btn btn-xs btn-primary"
                         >
-                          {alreadySent
-                            ? "Sent"
-                            : isThisSending
-                              ? "Sending..."
-                              : "Add"}
+                          {isThisSending ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : alreadySent ? (
+                            <>
+                              <CheckCircleIcon className="size-4 mr-2" />
+                              Sent
+                            </>
+                          ) : (
+                            <>
+                              <UserPlusIcon className="size-4 mr-2" />
+                              Add
+                            </>
+                          )}
                         </button>
                       ) : (
                         <button className="btn btn-ghost btn-circle">
@@ -167,15 +222,6 @@ const HomePage = () => {
                   friend={friend}
                 />
               ))
-            )}
-
-            {/* Send Request Error */}
-            {sendError && (
-              <p className="text-red-500 text-sm mt-2">
-                {sendError?.response?.data?.message ||
-                  sendError.message ||
-                  "Request failed"}
-              </p>
             )}
           </div>
         </div>
@@ -217,17 +263,17 @@ const HomePage = () => {
 
         {/* 🔥 HEADER (ALWAYS CLICKABLE) */}
         <button
-            className="btn btn-sm border shadow-lg w-32 bg-base-100 absolute right-6 top-4 z-20 transition-all duration-200"
-            onClick={() => setIsBlurred((prev) => !prev)}
-          >
-            Toggle Blur
-            {!isBlurred ? (
-              <MessageCircleOff className="size-4 transition duration-200 text-base-content opacity-70" />
-            ) : (
-              <MessageCircle className="size-4 transition duration-200 text-base-content opacity-70" />
-            )}
-          </button>
-        
+          className="btn btn-sm border shadow-lg w-32 bg-base-100 absolute right-6 top-4 z-20 transition-all duration-200"
+          onClick={() => setIsBlurred((prev) => !prev)}
+        >
+          Toggle Blur
+          {!isBlurred ? (
+            <MessageCircleOff className="size-4 transition duration-200 text-base-content opacity-70" />
+          ) : (
+            <MessageCircle className="size-4 transition duration-200 text-base-content opacity-70" />
+          )}
+        </button>
+
         {/* 🔥 BODY (ONLY THIS GETS DISABLED) */}
         <div
           className={`flex flex-col flex-1 transition-all duration-300 ${
@@ -235,18 +281,18 @@ const HomePage = () => {
           }`}
         >
           <div className="p-4 border-b border-base-300 flex justify-between items-center gap-3">
-          <div className="flex gap-3 items-center">
-            <div className="avatar">
-              <div className="w-10 rounded-full">
-                <img src="https://api.dicebear.com/9.x/toon-head/svg?seed=Kimberly" />
+            <div className="flex gap-3 items-center">
+              <div className="avatar">
+                <div className="w-10 rounded-full">
+                  <img src="https://api.dicebear.com/9.x/toon-head/svg?seed=Kimberly" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold">John Doe</h3>
+                <p className="text-xs opacity-70">Online</p>
               </div>
             </div>
-            <div>
-              <h3 className="font-semibold">John Doe</h3>
-              <p className="text-xs opacity-70">Online</p>
-            </div>
           </div>
-        </div>
           <div className="flex-1 p-4 overflow-y-auto space-y-3">
             <div className="chat chat-start">
               <div className="chat-bubble">Hello 👋</div>
