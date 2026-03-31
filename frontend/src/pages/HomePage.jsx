@@ -3,6 +3,7 @@ import { getOutgoingFriendReqs, sendFriendReqs } from "../lib/api.js";
 import FriendCard from "../components/FriendCard.jsx";
 import NoFriendsFound from "../components/NoFriendsFound.jsx";
 import {
+  useGetFriendRequests,
   useGetRecommendedUsers,
   useGetUserFriends,
   useOutgoingFriendReqs,
@@ -11,6 +12,7 @@ import {
 } from "../hooks/useFriendRequests.js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  BellIcon,
   CheckCircleIcon,
   MessageCircle,
   MessageCircleOff,
@@ -18,6 +20,12 @@ import {
   MessagesSquare,
   UserPlusIcon,
 } from "lucide-react";
+import NoNotificationsFound from "../components/NoNotificationsFound.jsx";
+import ChatPage from "./ChatPage.jsx";
+import { useChatOpen } from "../store/useChatOpen.js";
+import NoChatBox from "../components/NoChatBox.jsx";
+import { useOpenChatOnly } from "../store/useOpenChatOnly.js";
+import { useSelectedUser } from "../store/useSelectedUser.js";
 
 const HomePage = () => {
   const [userName, setUserName] = useState("");
@@ -27,6 +35,13 @@ const HomePage = () => {
   const [friendsIds, setFriendsIds] = useState(new Set());
   const [isBlurred, setIsBlurred] = useState(false);
   const [showError, setShowError] = useState("");
+  const { friendRequests, isLoading } = useGetFriendRequests();
+
+  const incomingRequests = friendRequests?.incomingReqs || [];
+
+  const { openChat } = useChatOpen();
+  const { openChatOnly } = useOpenChatOnly();
+  const { selectedUser } = useSelectedUser();
 
   const { friends, loadingFriends } = useGetUserFriends();
   const { data: outgoingFriendReqs = [] } = useQuery({
@@ -99,8 +114,6 @@ const HomePage = () => {
     }
   }, [outgoingFriendReqs]);
 
-  
-
   useEffect(() => {
     if (sendError && userName) {
       setShowError(sendError);
@@ -114,7 +127,7 @@ const HomePage = () => {
   }, [sendError, userName, searchedUsers]);
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col md:flex-row p-10 gap-8 justify-between bg-base-100">
+    <div className="h-[calc(100vh-64px)] flex flex-col md:flex-row p-10 gap-8 justify-between bg-base-100 overflow-hidden">
       {/* 🔥 LEFT SIDEBAR */}
       <div className="w-80 flex flex-col gap-4">
         {/* 🔥 FRIENDS + SEARCH */}
@@ -161,11 +174,10 @@ const HomePage = () => {
               ) : (
                 searchedUsers.map((user) => {
                   if (!user?._id) return null;
-                  
+
                   const alreadySent = outgoingRequestsIds.has(user._id);
                   const isFriend = friendsIds.has(user._id);
                   const isThisSending = pendingRequestId === user._id;
-                  
 
                   return (
                     <div
@@ -233,86 +245,59 @@ const HomePage = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 space-y-2">
-            {[1, 2, 3].map((_, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-base-300 cursor-pointer"
-              >
-                <div className="avatar">
-                  <div className="w-8 rounded-full">
-                    <img src="https://api.dicebear.com/9.x/toon-head/svg?seed=notif" />
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium">New friend request</p>
-                  <p className="text-xs opacity-70">2 min ago</p>
-                </div>
+            {isLoading ? (
+              <div className="flex justify-center py-6">
+                <span className="loading loading-spinner loading-lg" />
               </div>
-            ))}
+            ) : incomingRequests.length > 0 ? (
+              <>
+                {incomingRequests.map((request) => (
+                  <div
+                    key={request._id}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-base-300 cursor-pointer"
+                  >
+                    <div className="avatar">
+                      <div className="w-8 rounded-full">
+                        <img
+                          src={request.sender.profilePic}
+                          alt={request.sender.fullName}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-semibold tracking-wide">
+                        {request.sender.userName}
+                      </p>
+                      <p className="text-sm font-medium">New friend request</p>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="flex items-center justify-center flex-col">
+                <div className="size-10 rounded-full bg-base-300 flex items-center justify-center mb-2 mt-4 ">
+                  <BellIcon className="size-5 text-base-content opacity-40" />
+                </div>
+                <h3 className="text-md font-semibold mb-2 text-center">
+                  No notifications yet
+                </h3>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* 🔥 RIGHT SIDE CHAT */}
-      <div className="relative border hidden md:flex border-base-300 rounded-2xl shadow-xl bg-base-200 flex-1 flex flex-col overflow-hidden">
-        {/* 🔥 BLUR OVERLAY */}
-        {isBlurred && (
-          <div className="absolute inset-0 z-10 backdrop-blur-md bg-black/30 transition-all duration-300 pointer-events-none" />
-        )}
-
-        {/* 🔥 HEADER (ALWAYS CLICKABLE) */}
-        <button
-          className="btn btn-sm border shadow-lg w-32 bg-base-100 absolute right-6 top-4 z-20 transition-all duration-200"
-          onClick={() => setIsBlurred((prev) => !prev)}
-        >
-          Toggle Blur
-          {!isBlurred ? (
-            <MessageCircleOff className="size-4 transition duration-200 text-base-content opacity-70" />
-          ) : (
-            <MessageCircle className="size-4 transition duration-200 text-base-content opacity-70" />
-          )}
-        </button>
-
-        {/* 🔥 BODY (ONLY THIS GETS DISABLED) */}
-        <div
-          className={`flex flex-col flex-1 transition-all duration-300 ${
-            isBlurred ? "scale-[0.98] opacity-70 pointer-events-none" : ""
-          }`}
-        >
-          <div className="p-4 border-b border-base-300 flex justify-between items-center gap-3">
-            <div className="flex gap-3 items-center">
-              <div className="avatar">
-                <div className="w-10 rounded-full">
-                  <img src="https://api.dicebear.com/9.x/toon-head/svg?seed=Kimberly" />
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold">John Doe</h3>
-                <p className="text-xs opacity-70">Online</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex-1 p-4 overflow-y-auto space-y-3">
-            <div className="chat chat-start">
-              <div className="chat-bubble">Hello 👋</div>
-            </div>
-
-            <div className="chat chat-end">
-              <div className="chat-bubble chat-bubble-primary">Hi bro 😄</div>
-            </div>
-          </div>
-
-          <div className="p-4 border-t border-base-300 flex gap-2">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              className="input input-bordered flex-1"
-            />
-            <button className="btn btn-primary">Send</button>
-          </div>
-        </div>
-      </div>
+      {openChat ? (
+        openChatOnly ? (
+          <ChatPage isBlurred={isBlurred} setIsBlurred={setIsBlurred} />
+        ) : (
+          <ChatPage isBlurred={isBlurred} setIsBlurred={setIsBlurred} />
+        )
+      ) : (
+        <NoChatBox />
+      )}
     </div>
   );
 };
