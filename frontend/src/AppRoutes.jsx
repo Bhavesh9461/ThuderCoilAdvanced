@@ -12,6 +12,7 @@ import EmailVerificationPage from './pages/EmailVerificationPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import NotificationsPage from './pages/NotificationsPage'
+import CallPage from './pages/CallPage'
 
 const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
 
@@ -72,8 +73,17 @@ const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
             </Layout>
           </ProtectedRoute>
         }
-        
         />
+
+
+        {/* call page */}
+        <Route path='/call/:id' element={
+          <ProtectedRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
+            <CallPage/>
+          </ProtectedRoute>
+        }
+        />
+
     </Routes>
   )
 }

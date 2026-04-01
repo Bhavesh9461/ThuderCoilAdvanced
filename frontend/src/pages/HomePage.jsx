@@ -239,7 +239,7 @@ const HomePage = () => {
         </div>
 
         {/* 🔔 NOTIFICATIONS */}
-        <div className="h-[40%] rounded-2xl shadow-xl border border-base-300 bg-base-200 flex flex-col">
+        <div className="h-[100%] md:h-[40%] rounded-2xl shadow-xl border border-base-300 bg-base-200 flex flex-col">
           <div className="p-4 border-b border-base-300 font-semibold">
             Notifications
           </div>
@@ -275,7 +275,7 @@ const HomePage = () => {
                 ))}
               </>
             ) : (
-              <div className="flex items-center justify-center flex-col">
+              <div className="flex h-full items-center justify-center flex-col">
                 <div className="size-10 rounded-full bg-base-300 flex items-center justify-center mb-2 mt-4 ">
                   <BellIcon className="size-5 text-base-content opacity-40" />
                 </div>

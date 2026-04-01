@@ -17,5 +17,26 @@
 }
 
 .str-chat__header-livestream {
-  background-color: hsl(var(--b2));
+  background-color: hsl(var(--b1));
+}
+
+/* FIX text visibility */
+.str-video {
+  color: white;
+}
+
+.dark .str-video {
+  color: white;
+}
+
+/* FORCE controls visible */
+.str-video__call-controls {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* FIX background */
+.str-video__participant-view {
+  background-color: white;
 }

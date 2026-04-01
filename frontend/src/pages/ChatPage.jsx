@@ -19,6 +19,7 @@ import {
 import { StreamChat } from "stream-chat";
 import ChatLoader from "../components/ChatLoader.jsx";
 import { useThemeStore } from "../store/useThemeStore.js";
+import CallButton from "../components/CallButton.jsx";
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -82,6 +83,25 @@ const ChatPage = ({ isBlurred, setIsBlurred }) => {
     initChat();
   }, [tokenData, authUser, targetUserId]);
 
+  // handle video Call
+  const handleVideoCall = () => {
+    if (channel) {
+      const callUrl = `${window.location.origin}/call/${channel.id}`;
+
+      channel.sendMessage({
+        text: `I've started video call. Join me here: ${callUrl}`,
+        attachments: [
+          {
+            type: "image",
+            image_url: "https://imgs.search.brave.com/2BmrG8Pnuq9w1BByeBjMc4-C4W0w-RrMcxZgCjoL8Qg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNzQv/MjkxLzk4My9zbWFs/bC9zaW1wbGUtYmxh/Y2stbGluZS1pY29u/LW9mLWEtdGh1bmRl/cnN0b3JtLWNsb3Vk/LXdpdGgtbGlnaHRu/aW5nLXZlY3Rvci5q/cGc", // must be public URL
+          },
+        ],
+      });
+
+      toast.success("Video Call link send successfully.");
+    }
+  };
+
   if (loading || !chatClient || !channel) return <ChatLoader />;
 
   // Theme Control
@@ -120,18 +140,17 @@ const ChatPage = ({ isBlurred, setIsBlurred }) => {
       {/* 🔥 BODY (ONLY THIS GETS DISABLED) */}
       <div
         className={`flex flex-col flex-1 transition-all duration-300 overflow-x-hidden ${
-          isBlurred ? "scale-[0.98] opacity-70 pointer-events-none" : ""
+          isBlurred ? "scale-[0.98] opacity-5 pointer-events-none" : ""
         }`}
       >
         {/* here was old component or ui/ux */}
-        <Chat
-          client={chatClient}
-          theme={
-            getStreamTheme(theme)
-          }
-        >
+        <Chat client={chatClient} theme={getStreamTheme(theme)}>
           <Channel channel={channel}>
             <div className="w-full relative">
+              {/* call button component */}
+              <CallButton handleVideoCall={handleVideoCall} />
+
+              {/* add channel component */}
               <Window>
                 <ChannelHeader />
                 <MessageList />
