@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.str-chat {
+  background-color: hsl(var(--b1));
+  color: hsl(var(--bc));
+}
+
+.str-chat__message-simple__content {
+  background-color: hsl(var(--b2));
+  color: hsl(var(--bc));
+}
+
+.str-chat__input-flat {
+  background-color: hsl(var(--b1));
+}
+
+.str-chat__header-livestream {
+  background-color: hsl(var(--b2));
+}

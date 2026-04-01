@@ -1,0 +1,31 @@
+{/* <div className="p-4 border-b border-base-300 flex justify-between items-center gap-3">
+          <div className="flex gap-3 items-center">
+            <div className="avatar">
+              <div className="w-10 rounded-full">
+                <img src={selectedUser.profilePic} />
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold">{selectedUser.userName}</h3>
+              <p className="text-xs opacity-70">{selectedUser.fullName}</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 p-4 overflow-y-auto space-y-3">
+          <div className="chat chat-start">
+            <div className="chat-bubble">Hello 👋</div>
+          </div>
+
+          <div className="chat chat-end">
+            <div className="chat-bubble chat-bubble-primary">Hi bro 😄</div>
+          </div>
+        </div>
+
+        <div className="p-4 border-t border-base-300 flex gap-2">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            className="input input-bordered flex-1"
+          />
+          <button className="btn btn-primary">Send</button>
+        </div> */}

@@ -1,14 +1,96 @@
 import { motion } from "framer-motion";
 import { MessageCircle, MessageCircleOff } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelectedUser } from "../store/useSelectedUser.js";
+import useAuthUser from "../hooks/useAuthUser.js";
+import { useQuery } from "@tanstack/react-query";
+import { getStreamToken } from "../lib/api.js";
 
+import { toast } from "react-hot-toast";
+import {
+  Channel,
+  ChannelHeader,
+  Chat,
+  MessageInput,
+  MessageList,
+  Thread,
+  Window,
+} from "stream-chat-react";
+import { StreamChat } from "stream-chat";
+import ChatLoader from "../components/ChatLoader.jsx";
+import { useThemeStore } from "../store/useThemeStore.js";
+
+const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
 const ChatPage = ({ isBlurred, setIsBlurred }) => {
+  const { selectedUser } = useSelectedUser();
+  const { theme } = useThemeStore();
 
-    const {selectedUser} = useSelectedUser()
-    console.log(selectedUser);
-    
+  const targetUserId = selectedUser._id;
+
+  const [chatClient, setChatClient] = useState(null);
+  const [channel, setChannel] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const { authUser } = useAuthUser();
+
+  const { data: tokenData } = useQuery({
+    queryKey: ["streamToken"],
+    queryFn: getStreamToken,
+    enabled: !!authUser, // this will run only when authUser is available
+  });
+
+  // create a connection
+  useEffect(() => {
+    const initChat = async () => {
+      if (!tokenData?.token || !authUser) return;
+
+      try {
+        console.log("Initializing stream chat client...");
+
+        const client = StreamChat.getInstance(STREAM_API_KEY);
+
+        await client.connectUser(
+          {
+            id: authUser._id,
+            name: authUser.userName,
+            image: authUser.profilePic,
+          },
+          tokenData.token,
+        );
+
+        //create channel using own id for that channel
+        const channelId = [authUser._id, targetUserId].sort().join("-");
+
+        const currChannel = client.channel("messaging", channelId, {
+          members: [authUser._id, targetUserId],
+        });
+
+        //fetch the channel state
+        await currChannel.watch();
+
+        setChatClient(client);
+        setChannel(currChannel);
+      } catch (error) {
+        console.error("Error initializing chat:", error);
+        toast.error("Could not connect to chat. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initChat();
+  }, [tokenData, authUser, targetUserId]);
+
+  if (loading || !chatClient || !channel) return <ChatLoader />;
+
+  // Theme Control
+  const getStreamTheme = (theme) => {
+    if (theme === "dark" || theme === "forest" || theme === "night") {
+      return "str-chat__theme-dark";
+    }
+    return "str-chat__theme-light"; // light + lemonade
+  };
 
   return (
     <motion.div
@@ -37,41 +119,29 @@ const ChatPage = ({ isBlurred, setIsBlurred }) => {
 
       {/* 🔥 BODY (ONLY THIS GETS DISABLED) */}
       <div
-        className={`flex flex-col flex-1 transition-all duration-300 ${
+        className={`flex flex-col flex-1 transition-all duration-300 overflow-x-hidden ${
           isBlurred ? "scale-[0.98] opacity-70 pointer-events-none" : ""
         }`}
       >
-        <div className="p-4 border-b border-base-300 flex justify-between items-center gap-3">
-          <div className="flex gap-3 items-center">
-            <div className="avatar">
-              <div className="w-10 rounded-full">
-                <img src={selectedUser.profilePic} />
-              </div>
+        {/* here was old component or ui/ux */}
+        <Chat
+          client={chatClient}
+          theme={
+            getStreamTheme(theme)
+          }
+        >
+          <Channel channel={channel}>
+            <div className="w-full relative">
+              <Window>
+                <ChannelHeader />
+                <MessageList />
+                <MessageInput focus />
+              </Window>
             </div>
-            <div>
-              <h3 className="font-semibold">{selectedUser.userName}</h3>
-              <p className="text-xs opacity-70">{selectedUser.fullName}</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 p-4 overflow-y-auto space-y-3">
-          <div className="chat chat-start">
-            <div className="chat-bubble">Hello 👋</div>
-          </div>
-
-          <div className="chat chat-end">
-            <div className="chat-bubble chat-bubble-primary">Hi bro 😄</div>
-          </div>
-        </div>
-
-        <div className="p-4 border-t border-base-300 flex gap-2">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            className="input input-bordered flex-1"
-          />
-          <button className="btn btn-primary">Send</button>
-        </div>
+            {/* for multiple threads or multiple replies on 1 msg */}
+            <Thread />
+          </Channel>
+        </Chat>
       </div>
     </motion.div>
   );
