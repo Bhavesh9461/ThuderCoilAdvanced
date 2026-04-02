@@ -3,42 +3,42 @@ import { useChatOpen } from "../store/useChatOpen.js";
 import { useOpenChatOnly } from "../store/useOpenChatOnly.js";
 import { useSelectedUser } from "../store/useSelectedUser.js";
 
-const FriendCard = ({ friend, icon: Icon }) => {
+const SearchFriendCard = ({ user, icon: Icon, isFriend }) => {
   const { openChat, setOpenChat } = useChatOpen();
   const { selectedUser, setSelectedUser } = useSelectedUser();
   const { openChatOnly, setOpenChatOnly } = useOpenChatOnly();
 
   const handleClick = () => {
-    setSelectedUser(friend);
+    setSelectedUser(user);
     setOpenChatOnly(true);
   };
 
   return (
     <div
       onClick={() => {
-        handleClick();
+        isFriend ? (handleClick()) : ""
       }}
-      className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-base-300 cursor-pointer"
+      className="flex items-center justify-between w-full gap-3 p-2 rounded-lg hover:bg-base-300 cursor-pointer"
     >
       <div className="flex items-center gap-3">
         <div className="avatar">
           <div className="w-7 sm:w-10 rounded-full border border-base-300">
-            <img src={friend.profilePic} />
+            <img src={user.profilePic} />
           </div>
         </div>
 
         <div>
-          <h3 className="font-medium">{friend.userName}</h3>
-          <p className="text-xs opacity-70">{friend.skill}</p>
+          <h3 className="font-medium">{user.userName}</h3>
+          <p className="text-xs opacity-70">{user.skill}</p>
         </div>
       </div>
 
       {/* Message Button */}
-      {Icon && (
+      {Icon && isFriend && (
         <button
           onClick={() => {
             openChat ? setOpenChat(false) : setOpenChat(true);
-            setSelectedUser(friend);
+            setSelectedUser(user);
           }}
           className="btn btn-ghost btn-circle hidden lg:inline-flex"
         >
@@ -46,14 +46,18 @@ const FriendCard = ({ friend, icon: Icon }) => {
         </button>
       )}
 
-        <Link to={`/chat/${friend._id}`} className="btn rounded-full lg:hidden">
+
+      {isFriend && isFriend ? (
+        <Link to={`/chat/${user._id}`} className="btn rounded-full lg:hidden">
           {Icon && (
-            <Icon className="h-4 w-4 sm:size-5 md:size-7 text-base-content opacity-70" />
+            <Icon className="h-4 w-4 sm:size-5 md:size-6 text-base-content opacity-70" />
           )}
         </Link>
-      
+      ) : (
+        ""
+      )}
     </div>
   );
 };
 
-export default FriendCard;
+export default SearchFriendCard;

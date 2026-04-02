@@ -26,6 +26,7 @@ import { useChatOpen } from "../store/useChatOpen.js";
 import NoChatBox from "../components/NoChatBox.jsx";
 import { useOpenChatOnly } from "../store/useOpenChatOnly.js";
 import { useSelectedUser } from "../store/useSelectedUser.js";
+import SearchFriendCard from "../components/SearchFriendCard.jsx";
 
 const HomePage = () => {
   const [userName, setUserName] = useState("");
@@ -183,7 +184,7 @@ const HomePage = () => {
                       key={user._id}
                       className="flex items-center justify-between p-2 rounded-lg hover:bg-base-300"
                     >
-                      <FriendCard friend={user} />
+                      <SearchFriendCard user={user} icon={MessageSquare} isFriend={isFriend} />
 
                       {/* 🔥 CONDITION */}
                       {!isFriend ? (
@@ -211,9 +212,7 @@ const HomePage = () => {
                           )}
                         </button>
                       ) : (
-                        <button className="btn btn-ghost btn-circle">
-                          <MessagesSquare className="h-4 w-4  sm:h-6 sm:w-6 text-base-content opacity-70" />
-                        </button>
+                        ""
                       )}
                     </div>
                   );
