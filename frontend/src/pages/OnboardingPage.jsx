@@ -158,7 +158,7 @@ const OnboardingPage = () => {
             </div>
 
             {/* submit button */}
-            <button className="btn btn-primary w-full"  disabled={isPending} type="submit">
+            <button className="btn btn-primary w-full mb-2"  disabled={isPending} type="submit">
                 {!isPending ? (
                   <>
                     <CloudLightning className="size-5 mr-2"/>
