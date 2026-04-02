@@ -38,10 +38,10 @@ const OnboardingPage = () => {
 
   return (
     <div
-      className="h-[100dvh] overflow-y-auto bg-gray-700 bg-base-100 flex lg:items-center justify-center p-4 "
+      className="h-[100dvh] overflow-y-auto bg-gray-700 bg-base-100 flex items-start justify-center p-4 "
       data-theme="dark"
     >
-      <div className="bg-base-200 rounded-2xl h-[103dvh] md:rounded-3xl w-full max-w-3xl shadow-xl">
+      <div className="bg-base-200 rounded-2xl md:rounded-3xl w-full max-w-3xl shadow-xl">
         <div className="p-6 sm:p-8">
           <h1 className="Capitalize text-2xl sm:text-3xl font-bold text-center mb-6">
             Complete Your Profile
