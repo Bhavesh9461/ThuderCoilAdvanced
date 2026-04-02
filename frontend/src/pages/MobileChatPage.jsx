@@ -113,7 +113,7 @@ const MobileChatPage = () => {
       {/* Toggle Button */}
       <button
         className="btn btn-sm border shadow-lg w-28 bg-base-100 absolute right-4 top-3 z-20"
-        onClick={() => setIsBlurred((prev) => !prev)}
+        onClick={() => isBlurred ? setIsBlurred(false) : setIsBlurred(true)}
       >
         {isBlurred ? "Non-Blur" : "Blur"}
         {isBlurred ? (
