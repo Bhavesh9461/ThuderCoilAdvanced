@@ -91,13 +91,7 @@ const ChatPage = () => {
       const callUrl = `${window.location.origin}/call/${channel.id}`;
 
       channel.sendMessage({
-        text: `I've started video call. Join me here: ${callUrl}`,
-        attachments: [
-          {
-            type: "image",
-            image_url: "https://imgs.search.brave.com/2BmrG8Pnuq9w1BByeBjMc4-C4W0w-RrMcxZgCjoL8Qg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNzQv/MjkxLzk4My9zbWFs/bC9zaW1wbGUtYmxh/Y2stbGluZS1pY29u/LW9mLWEtdGh1bmRl/cnN0b3JtLWNsb3Vk/LXdpdGgtbGlnaHRu/aW5nLXZlY3Rvci5q/cGc", // must be public URL
-          },
-        ],
+        text: `I've started video call. Join me here: ${callUrl} via desktop/tablet`,
       });
 
       toast.success("Video Call link send successfully.");

@@ -83,7 +83,7 @@ const MobileChatPage = () => {
     const callUrl = `${window.location.origin}/call/${channel.id}`;
 
     channel.sendMessage({
-      text: `I've started video call. Join: ${callUrl}`,
+      text: `I've started video call. Join: ${callUrl} via mobile`,
     });
 
     toast.success("Call link sent");
