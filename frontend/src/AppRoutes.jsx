@@ -63,9 +63,9 @@ const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
         } />
 
         <Route path='/onboarding' element={
-           <OnboardingRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
+          //  <OnboardingRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
               <OnboardingPage/>
-           </OnboardingRoute>
+          //  </OnboardingRoute>
           } 
         />
 
