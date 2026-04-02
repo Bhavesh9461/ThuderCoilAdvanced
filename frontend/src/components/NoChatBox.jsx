@@ -8,7 +8,7 @@ const NoChatBox = () => {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative border hidden md:flex border-base-300 rounded-2xl shadow-xl bg-base-300 flex-1 flex flex-col overflow-hidden items-center justify-center select-none"
+      className="relative border hidden lg:flex border-base-300 rounded-2xl shadow-xl bg-base-300 flex-1 flex flex-col overflow-hidden items-center justify-center select-none"
     >
       {/* APP LOGO */}
       <AppLogoIncoded />

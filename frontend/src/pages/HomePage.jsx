@@ -33,7 +33,6 @@ const HomePage = () => {
   const [outgoingRequestsIds, setOutgoingRequestsIds] = useState(new Set());
   const [pendingRequestId, setPendingRequestId] = useState(null);
   const [friendsIds, setFriendsIds] = useState(new Set());
-  const [isBlurred, setIsBlurred] = useState(false);
   const [showError, setShowError] = useState("");
   const { friendRequests, isLoading } = useGetFriendRequests();
 
@@ -127,11 +126,11 @@ const HomePage = () => {
   }, [sendError, userName, searchedUsers]);
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col md:flex-row p-10 gap-8 justify-between bg-base-100 overflow-hidden">
+    <div className="h-[calc(100vh-64px)] flex lg:flex-row p-10 gap-8 justify-between bg-base-100 overflow-hidden">
       {/* 🔥 LEFT SIDEBAR */}
-      <div className="w-80 flex flex-col gap-4">
+      <div className="w-full lg:w-80 flex flex-col md:flex-row lg:flex-col gap-4">
         {/* 🔥 FRIENDS + SEARCH */}
-        <div className="h-[60%] rounded-2xl shadow-xl border border-base-300 bg-base-200 flex flex-col">
+        <div className="h-full lg:flex-[1.5] flex-1 rounded-2xl shadow-xl border border-base-300 bg-base-200 flex flex-col">
           {/* 🔍 SEARCH */}
           <div className="p-4 border-b border-base-300">
             <input
@@ -239,7 +238,7 @@ const HomePage = () => {
         </div>
 
         {/* 🔔 NOTIFICATIONS */}
-        <div className="h-[100%] md:h-[40%] rounded-2xl shadow-xl border border-base-300 bg-base-200 flex flex-col">
+        <div className="h-[100%] flex-1 hidden lg:flex rounded-2xl shadow-xl border border-base-300 bg-base-200 flex flex-col">
           <div className="p-4 border-b border-base-300 font-semibold">
             Notifications
           </div>
@@ -291,9 +290,9 @@ const HomePage = () => {
       {/* 🔥 RIGHT SIDE CHAT */}
       {openChat ? (
         openChatOnly ? (
-          <ChatPage isBlurred={isBlurred} setIsBlurred={setIsBlurred} />
+          <ChatPage />
         ) : (
-          <ChatPage isBlurred={isBlurred} setIsBlurred={setIsBlurred} />
+          <ChatPage />
         )
       ) : (
         <NoChatBox />

@@ -13,6 +13,9 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import NotificationsPage from './pages/NotificationsPage'
 import CallPage from './pages/CallPage'
+import MobileOnlyRoute from './middleware/MobileOnlyRoute'
+import ChatPage from './pages/ChatPage'
+import MobileChatPage from './pages/MobileChatPage'
 
 const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
 
@@ -82,6 +85,20 @@ const AppRoutes = ({isAuthenticated, isOnboarded, isVerified}) => {
             <CallPage/>
           </ProtectedRoute>
         }
+        />
+
+
+        {/* chat page route - only for mobile */}
+        <Route path='/chat/:id' element={
+          <ProtectedRoute isAuthenticated={isAuthenticated} isOnboarded={isOnboarded} isVerified={isVerified}>
+            <MobileOnlyRoute>
+            <Layout>
+              <MobileChatPage/>
+            </Layout>
+            </MobileOnlyRoute>
+          </ProtectedRoute>
+        }
+        
         />
 
     </Routes>

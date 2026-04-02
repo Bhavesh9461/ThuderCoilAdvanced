@@ -1,3 +1,4 @@
+import { Link, useNavigate } from "react-router";
 import { useChatOpen } from "../store/useChatOpen.js";
 import { useOpenChatOnly } from "../store/useOpenChatOnly.js";
 import { useSelectedUser } from "../store/useSelectedUser.js";
@@ -9,11 +10,16 @@ const FriendCard = ({ friend, icon:Icon }) => {
   const {selectedUser, setSelectedUser} = useSelectedUser()
   const {openChatOnly, setOpenChatOnly} = useOpenChatOnly()
 
+
+  const handleClick = () =>{
+    setSelectedUser(friend)
+    setOpenChatOnly(true)
+  }
+
   return (
     <div 
     onClick={()=>{
-      setOpenChatOnly(true)
-      setSelectedUser(friend)
+      handleClick()
     }}
     className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-base-300 cursor-pointer">
       <div className="flex items-center gap-3">
@@ -36,10 +42,14 @@ const FriendCard = ({ friend, icon:Icon }) => {
           openChat ? setOpenChat(false) : setOpenChat(true)
           setSelectedUser(friend)
         }}
-        className="btn btn-ghost btn-circle">
+        className="btn btn-ghost btn-circle hidden lg:inline-flex">
         <Icon className="h-4 w-4  sm:h-6 sm:w-6 text-base-content opacity-70" />
       </button>
       )}
+
+      <Link to={`/chat/${friend._id}`} className='btn rounded-full lg:hidden'>
+        {Icon && <Icon className="h-4 w-4 sm:size-5 md:size-7 text-base-content opacity-70" />}
+      </Link>
 
     </div>
   );

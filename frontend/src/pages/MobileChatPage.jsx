@@ -20,16 +20,15 @@ import { StreamChat } from "stream-chat";
 import ChatLoader from "../components/ChatLoader.jsx";
 import { useThemeStore } from "../store/useThemeStore.js";
 import CallButton from "../components/CallButton.jsx";
+import { useParams } from "react-router";
 import { useChatBlur } from "../store/useChatBlur.js";
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
-const ChatPage = () => {
-  const { selectedUser } = useSelectedUser();
+const MobileChatPage = () => {
+  const { id: targetUserId } = useParams();
   const { theme } = useThemeStore();
-  const {isBlurred,setIsBlurred} = useChatBlur()
-
-  const targetUserId = selectedUser._id;
+  const { isBlurred, setIsBlurred } = useChatBlur();
 
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
@@ -95,7 +94,8 @@ const ChatPage = () => {
         attachments: [
           {
             type: "image",
-            image_url: "https://imgs.search.brave.com/2BmrG8Pnuq9w1BByeBjMc4-C4W0w-RrMcxZgCjoL8Qg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNzQv/MjkxLzk4My9zbWFs/bC9zaW1wbGUtYmxh/Y2stbGluZS1pY29u/LW9mLWEtdGh1bmRl/cnN0b3JtLWNsb3Vk/LXdpdGgtbGlnaHRu/aW5nLXZlY3Rvci5q/cGc", // must be public URL
+            image_url:
+              "https://imgs.search.brave.com/2BmrG8Pnuq9w1BByeBjMc4-C4W0w-RrMcxZgCjoL8Qg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNzQv/MjkxLzk4My9zbWFs/bC9zaW1wbGUtYmxh/Y2stbGluZS1pY29u/LW9mLWEtdGh1bmRl/cnN0b3JtLWNsb3Vk/LXdpdGgtbGlnaHRu/aW5nLXZlY3Rvci5q/cGc", // must be public URL
           },
         ],
       });
@@ -119,7 +119,7 @@ const ChatPage = () => {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative border hidden lg:flex border-base-300 rounded-2xl shadow-xl bg-base-200 flex-1 flex flex-col overflow-hidden"
+      className="relative border h-[92dvh] border-base-300 rounded-2xl shadow-xl bg-base-200 flex-1 flex flex-col overflow-hidden"
     >
       {/* 🔥 BLUR OVERLAY */}
       {isBlurred && (
@@ -128,10 +128,13 @@ const ChatPage = () => {
 
       {/* 🔥 HEADER (ALWAYS CLICKABLE) */}
       <button
-        className="btn btn-sm border shadow-lg w-32 bg-base-100 absolute right-5 top-3 z-20 transition-all duration-200"
-        onClick={() => isBlurred ? setIsBlurred(false) : setIsBlurred(true)}
+        className="btn btn-sm border shadow-lg w-28 bg-base-100 absolute right-4 top-3 z-20 transition-all duration-200"
+        onClick={() => {
+          isBlurred ? setIsBlurred(false) : setIsBlurred(true);
+        }}
       >
-        Toggle Blur
+        {isBlurred ? "Non-Blur" : "Blur"}
+
         {!isBlurred ? (
           <MessageCircleOff className="size-4 transition duration-200 text-base-content opacity-70" />
         ) : (
@@ -146,9 +149,7 @@ const ChatPage = () => {
         }`}
       >
         {/* here was old component or ui/ux */}
-        <Chat client={chatClient} 
-        theme={getStreamTheme(theme)}
-        >
+        <Chat client={chatClient} theme={getStreamTheme(theme)}>
           <Channel channel={channel}>
             <div className="w-full relative">
               {/* call button component */}
@@ -170,4 +171,4 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage;
+export default MobileChatPage;

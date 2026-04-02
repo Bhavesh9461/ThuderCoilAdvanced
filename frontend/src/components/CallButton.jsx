@@ -3,7 +3,7 @@ import React from 'react'
 
 const CallButton = ({handleVideoCall}) => {
   return (
-    <div className="p-3 border-b flex items-center justify-center max-w-7xl mx-auto w-full absolute top-0">
+    <div className="p-3 border-b flex items-center justify-center ml-8 max-w-7xl mx-auto w-full absolute top-0">
         <button 
          onClick={handleVideoCall}
          className="btn btn-primary btn-sm text-white"
