@@ -1,4 +1,10 @@
-import { BellIcon, CloudLightning, HomeIcon, LogOutIcon, UsersIcon } from "lucide-react";
+import {
+  BellIcon,
+  CloudLightning,
+  HomeIcon,
+  LogOutIcon,
+  UsersIcon,
+} from "lucide-react";
 import React from "react";
 import { Link, useLocation } from "react-router";
 import NavLink from "./NavLink";
@@ -6,7 +12,6 @@ import useAuthUser from "../hooks/useAuthUser.js";
 import AppLogo from "./AppLogo";
 import { AnimatePresence, motion } from "framer-motion";
 import useLogout from "../hooks/useLogout.js";
-
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { authUser } = useAuthUser();
@@ -45,12 +50,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                 LinkName={"Home"}
               />
 
-              <NavLink
-                routePath="/friends"
-                icon={UsersIcon}
-                currentPath={currentPath === "/friends"}
-                LinkName={"Friends"}
-              />
+              {/* FRIENDS */}
+              <Link
+                className={`btn btn-ghost justify-start w-full gap-3 px-3 cursor-not-allowed opacity-50 normal-case
+                ${currentPath === "/friends" ? "btn-active" : ""} `}
+              >
+                <UsersIcon className="size-5 text-base-content opacity-70" />
+                <span>Friends</span>
+              </Link>
 
               <NavLink
                 routePath="/notifications"
@@ -59,7 +66,6 @@ const Sidebar = ({ isOpen, onClose }) => {
                 LinkName={"Notifications"}
               />
 
-              
               {/* LOGOUT BUTTON */}
               <button
                 className="btn btn-ghost justify-start w-full gap-3 normal-case"
@@ -80,12 +86,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="flex-1">
-                  <p className="font-semibold text-sm">
-                    {authUser?.userName}
-                  </p>
-                  <p className="text-xs">
-                    {authUser?.fullName}
-                  </p>
+                  <p className="font-semibold text-sm">{authUser?.userName}</p>
+                  <p className="text-xs">{authUser?.fullName}</p>
                   <p className="text-xs text-green-600 flex items-center gap-1">
                     <span className="size-2 rounded-full bg-green-700 inline-block" />
                     Online

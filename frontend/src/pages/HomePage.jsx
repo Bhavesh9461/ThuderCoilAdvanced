@@ -126,9 +126,9 @@ const HomePage = () => {
   }, [sendError, userName, searchedUsers]);
 
   return (
-    <div className="h-[calc(100vh-64px)] flex lg:flex-row p-10 gap-8 justify-between bg-base-100 overflow-hidden">
+    <div className="h-[calc(100dvh-64px)] flex flex-col lg:flex-row p-10 gap-8 justify-between bg-base-100 overflow-hidden">
       {/* 🔥 LEFT SIDEBAR */}
-      <div className="w-full lg:w-80 flex flex-col md:flex-row lg:flex-col gap-4">
+      <div className="w-full lg:w-80 flex h-full flex-col md:flex-row lg:flex-col gap-4">
         {/* 🔥 FRIENDS + SEARCH */}
         <div className="h-full lg:flex-[1.5] flex-1 rounded-2xl shadow-xl border border-base-300 bg-base-200 flex flex-col">
           {/* 🔍 SEARCH */}

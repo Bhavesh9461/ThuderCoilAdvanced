@@ -119,7 +119,7 @@ const MobileChatPage = () => {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative border h-[92dvh] border-base-300 rounded-2xl shadow-xl bg-base-200 flex-1 flex flex-col overflow-hidden"
+      className="relative border h-[calc(100vh-64px)] border-base-300 rounded-2xl shadow-xl bg-base-200 flex-1 flex flex-col overflow-hidden"
     >
       {/* 🔥 BLUR OVERLAY */}
       {isBlurred && (

@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
 .str-chat {
   background-color: hsl(var(--b1));
   color: hsl(var(--bc));
