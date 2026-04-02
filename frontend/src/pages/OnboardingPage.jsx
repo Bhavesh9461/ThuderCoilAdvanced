@@ -42,7 +42,7 @@ const OnboardingPage = () => {
       data-theme="dark"
     >
       <div className="bg-base-200 rounded-2xl h-[103dvh] md:rounded-3xl w-full max-w-3xl shadow-xl">
-        <div className="p-6 py-8  sm:p-8">
+        <div className="p-6 sm:p-8">
           <h1 className="Capitalize text-2xl sm:text-3xl font-bold text-center mb-6">
             Complete Your Profile
           </h1>
