@@ -28,7 +28,7 @@ const SignUpPage = () => {
 
   return (
     <div
-      className=" flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-900 relative overflow-hidden"
+      className="h-[100dvh] flex sm:items-start items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-900 relative overflow-x-hidden overflow-y-auto"
       data-theme="forest"
     >
       <FloatingShape
@@ -57,7 +57,7 @@ const SignUpPage = () => {
         initial={{ opacity: 0, y: 160 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-5xl mx-auto bg-base-100 bg-opacity-30 rounded-2xl shadow-xl overflow-hidden backdrop-filter backdrop-blur-xl"
+        className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-5xl mx-auto bg-base-100 bg-opacity-30 rounded-2xl shadow-xl overflow-y-auto overflow-x-hidden backdrop-filter backdrop-blur-xl"
       >
         {/* SIGNUP FORM - LEFT SIDE */}
         <div className="w-full lg:w-1/2 p-4 sm:p-8 flex flex-col">
