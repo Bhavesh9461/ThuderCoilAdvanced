@@ -12,6 +12,9 @@ const useSignUp = () => {
         onSuccess: () =>{
             toast.success("We sent a email, verify your email.")
             queryClient.invalidateQueries({queryKey: ["authUser"]})
+        },
+        onError: (error)=>{
+            toast.error(error?.response?.data?.message || error?.message || "Something Went Wrong! Please try again")
         }
     })
 

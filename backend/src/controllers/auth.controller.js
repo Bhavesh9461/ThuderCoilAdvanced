@@ -45,11 +45,16 @@ export async function signup(req, res) {
       });
     }
 
-    const isUserExists = await userModel.findOne({ userName });
+    const isUserExists = await userModel.findOne({ 
+      $or: [
+        {userName},
+        {email}
+      ]
+     });
 
     if (isUserExists) {
       return res.status(400).json({
-        message: "User already exists with this username",
+        message: `User already exists with this ${isUserExists.userName === userName ? "username" : "email"}`,
       });
     }
 
